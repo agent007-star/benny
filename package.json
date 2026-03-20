@@ -1,5 +1,5 @@
 {
-  "name": "benny",
+  "name": "@benny-co/cli",
   "version": "0.1.0",
   "description": "Benny - AI代码助手，专为中文开发者打造。支持通义、文心、Kimi等国产AI模型，提供代码优化、注释生成、AI审查、Git工作流集成等功能。",
   "type": "module",
@@ -21,7 +21,8 @@
   },
   "homepage": "https://github.com/benny-co/benny#readme",
   "bin": {
-    "benny": "./dist/cli/index.js"
+    "benny": "./dist/cli/index.js",
+    "benny-ai": "./dist/cli/index.js"
   },
   "scripts": {
     "build": "tsc",
