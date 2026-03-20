@@ -1,0 +1,26 @@
+# Benny - .npmrc 配置示例
+# 复制此文件到 ~/.npmrc 或项目根目录的 .npmrc
+
+# ===========================================
+# API Keys 配置（必填，至少一个）
+# ===========================================
+
+# 阿里云通义 API Key（推荐新手，额度充足）
+# 获取地址：https://dashscope.console.aliyun.com/
+TONGYI_API_KEY=your_tongyi_api_key_here
+
+# 百度文心 API Key + Secret
+# 获取地址：https://console.bce.baidu.com/
+# WENXIN_API_KEY=your_wenxin_api_key_here
+# WENXIN_SECRET_KEY=your_wenxin_secret_key_here
+
+# 月之暗面 Kimi API Key
+# 获取地址：https://platform.moonshot.cn/
+# KIMI_API_KEY=your_kimi_api_key_here
+
+# ===========================================
+# Benny 使用统计（可选）
+# ===========================================
+
+# 禁用使用统计上传
+# BENNY_NO_TELEMETRY=true

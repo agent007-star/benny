@@ -1,0 +1,46 @@
+{
+  "name": "benny",
+  "version": "0.1.0",
+  "description": "Benny - AI代码助手，专为中文开发者打造。支持通义、文心、Kimi等国产AI模型，提供代码优化、注释生成、AI审查、Git工作流集成等功能。",
+  "type": "module",
+  "keywords": [
+    "ai",
+    "code-assistant",
+    "chinese",
+    "中文",
+    "tongyi",
+    "wenxin",
+    "kimi",
+    "code-review",
+    "git",
+    "cli"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/benny-co/benny"
+  },
+  "homepage": "https://github.com/benny-co/benny#readme",
+  "bin": {
+    "benny": "./dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli/index.js",
+    "dev": "tsx src/cli/index.ts",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^13.0.0",
+    "diff": "^5.2.0",
+    "dotenv": "^16.4.0",
+    "ora": "^8.0.0",
+    "simple-git": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/diff": "^5.2.0",
+    "@types/node": "^22.19.15",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
