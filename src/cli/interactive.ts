@@ -1,8 +1,10 @@
 import * as readline from "readline";
 import chalk from "chalk";
-import { chat } from "../ai/client.js";
-import { AiModel, ChatMessage } from "../ai/models.js";
 import ora from "ora";
+import { streamChat, chat } from "../ai/client.js";
+import type { AiModel, ChatMessage } from "../ai/models.js";
+import { PlanLimitError } from "../monetization/usage-tracker.js";
+import type { ChatSession } from "../utils/chat-history.js";
 
 const SYSTEM_PROMPT = `你是Benny Co.的AI编程助手，专为中文开发者服务。
 
@@ -16,7 +18,9 @@ const SYSTEM_PROMPT = `你是Benny Co.的AI编程助手，专为中文开发者�
 
 export async function chatLoop(
   model: AiModel,
-  messages: ChatMessage[]
+  messages: ChatMessage[],
+  streaming = true,
+  session?: ChatSession
 ) {
   if (!messages.some((m) => m.role === "system")) {
     messages.push({ role: "system", content: SYSTEM_PROMPT });
@@ -27,18 +31,20 @@ export async function chatLoop(
     output: process.stdout,
   });
 
-  console.log(chalk.gray(`  模型: ${model.name} | 提供商: ${model.provider}\n`));
+  console.log(chalk.gray(`  模型: ${model.name} | 提供商: ${model.provider} | 流式: ${streaming ? "开启" : "关闭"}\n`));
   console.log(chalk.gray("  输入 exit 退出，clear 清空对话\n"));
 
-  const prompt = () =>
-    new Promise<string>((resolve) => {
-      rl.question(chalk.blue("👤 你: "), (answer: string) => resolve(answer));
-    });
+  const question = (prompt: string): Promise<string> =>
+    new Promise((resolve) => rl.question(prompt, resolve));
 
   while (true) {
-    const input = await prompt();
+    const input = await question(chalk.blue("你: "));
     if (!input.trim() || input.toLowerCase() === "exit" || input.toLowerCase() === "quit") {
-      console.log(chalk.gray("\n再见！👋\n"));
+      if (session && messages.length > 0) {
+        console.log(chalk.gray(`\n对话已保存。加载: benny chat --session ${session.id}\n`));
+      } else {
+        console.log(chalk.gray("\n再见！\n"));
+      }
       rl.close();
       return;
     }
@@ -50,26 +56,58 @@ export async function chatLoop(
     }
 
     messages.push({ role: "user", content: input });
-
-    const spinner = ora({ text: chalk.gray("Benny思考中..."), color: "cyan" }).start();
     const start = Date.now();
 
     try {
-      const response = await chat({ model, messages, temperature: 0.7, maxTokens: 2048 });
-      spinner.stop();
+      if (streaming && model.provider !== "wenxin") {
+        process.stdout.write(chalk.green("\nBenny: "));
+        let fullContent = "";
+        let usage: { promptTokens: number; completionTokens: number; totalTokens: number } | undefined;
 
-      messages.push({ role: "assistant", content: response.content });
+        await streamChat(
+          { model, messages, temperature: 0.7, maxTokens: 2048 },
+          (chunk) => {
+            if (!chunk.done) {
+              process.stdout.write(chunk.content);
+              fullContent += chunk.content;
+            } else if (chunk.usage) {
+              usage = chunk.usage;
+            }
+          }
+        );
 
-      const elapsed = ((Date.now() - start) / 1000).toFixed(1);
-      const tokenInfo = response.usage
-        ? chalk.gray(` [${response.usage.totalTokens} tokens, ${elapsed}s]`)
-        : chalk.gray(` [${elapsed}s]`);
+        messages.push({ role: "assistant", content: fullContent });
 
-      console.log(chalk.green("\n🤖 Benny: ") + response.content.replace(/\n/g, "\n" + chalk.green("🤖 Benny: ")));
-      console.log(tokenInfo + "\n");
+        const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+        const tokenInfo = usage
+          ? chalk.gray(`\n\n[${usage.totalTokens} tokens, ${elapsed}s]\n`)
+          : chalk.gray(`\n\n[${elapsed}s]\n`);
+        process.stdout.write(tokenInfo);
+      } else {
+        const spinner = ora({ text: chalk.gray("Benny思考中..."), color: "cyan" });
+        spinner.start();
+
+        const response = await chat({ model, messages, temperature: 0.7, maxTokens: 2048 });
+
+        spinner.stop();
+
+        messages.push({ role: "assistant", content: response.content });
+
+        const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+        const tokenInfo = response.usage
+          ? chalk.gray(` [${response.usage.totalTokens} tokens, ${elapsed}s]`)
+          : chalk.gray(` [${elapsed}s]`);
+
+        console.log(chalk.green("\nBenny: ") + response.content.replace(/\n/g, "\n" + chalk.green("Benny: ")));
+        console.log(tokenInfo + "\n");
+      }
     } catch (err) {
-      spinner.stop();
-      console.error(chalk.red(`\n错误: ${(err as Error).message}\n`));
+      if (err instanceof PlanLimitError) {
+        console.error(chalk.red(`\n${err.message}\n`));
+        console.log(chalk.cyan("  查看升級選項: benny upgrade\n"));
+      } else {
+        console.error(chalk.red(`\n错误: ${(err as Error).message}\n`));
+      }
     }
   }
 }

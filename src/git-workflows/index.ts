@@ -17,7 +17,6 @@ export interface CommitAnalysis {
 
 export async function analyzeChanges(git: SimpleGit): Promise<CommitAnalysis> {
   const status = await git.status();
-  const diffSummary = await git.diffSummary(["--staged", "HEAD"]);
   const diff = await git.diff(["--staged"]);
 
   const lines = diff.split("\n");

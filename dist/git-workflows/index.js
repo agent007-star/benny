@@ -2,7 +2,6 @@ import { simpleGit } from "simple-git";
 import { reviewCode } from "../optimizers/chinese-code.js";
 export async function analyzeChanges(git) {
     const status = await git.status();
-    const diffSummary = await git.diffSummary(["--staged", "HEAD"]);
     const diff = await git.diff(["--staged"]);
     const lines = diff.split("\n");
     let additions = 0;

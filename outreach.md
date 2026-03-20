@@ -116,6 +116,21 @@ https://github.com/benny-co/benny
 - [ ] GitHub remote not set (requires GitHub auth)
 - [ ] Community posts not yet published (requires manual posting or platform API keys)
 - [ ] GitHub repo creation pending (requires GitHub auth)
+- [x] npm tarball created: `benny-co-cli-0.1.0.tgz` (can distribute directly!)
+
+## Installation Alternatives (2026-03-20)
+
+Since GitHub/npm blocked, distribute via tarball:
+```bash
+npm install ./benny-co-cli-0.1.0.tgz -g
+```
+
+Or via npx (no install):
+```bash
+npx @benny-co/cli chat  # doesn't work yet (not published)
+```
+
+**Best option when GitHub unblocked:** GitHub releases with attached tarball.
 
 ## Next Steps (Require Human/Auth Action)
 
@@ -123,3 +138,4 @@ https://github.com/benny-co/benny
 2. Post to V2EX, 掘金, 知乎 with the copy above
 3. Set up GitHub Actions for CI
 4. Create beta signup form/issue template
+5. Publish to npm when account ready

@@ -92,3 +92,18 @@ function extractCodeBlock(content, language) {
         return match[1].trim();
     return content.trim();
 }
+export async function explainCode(code, language) {
+    const model = selectModel();
+    const messages = [
+        {
+            role: "system",
+            content: "你是一个代码导师。用简洁的中文解释代码逻辑，包括：1) 整体功能概述 2) 关键逻辑解释 3) 重要的设计模式或算法 4) 对初学者友好的建议。使用markdown格式，适当使用代码块。",
+        },
+        {
+            role: "user",
+            content: `解释以下${language}代码：\n\n\`\`\`${language}\n${code}\n\`\`\``,
+        },
+    ];
+    const response = await chat({ model, messages, temperature: 0.3 }, "explain");
+    return response.content;
+}
