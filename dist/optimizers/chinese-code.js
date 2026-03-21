@@ -86,7 +86,7 @@ export async function translateCode(code, fromLang, toLang) {
     const response = await chat({ model, messages, temperature: 0.3 }, "translate");
     return extractCodeBlock(response.content, toLang);
 }
-function extractCodeBlock(content, language) {
+function extractCodeBlock(content, _language) {
     const match = content.match(/```(?:\w+)?\n([\s\S]*?)```/);
     if (match)
         return match[1].trim();

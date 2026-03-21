@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { Command } from "commander";
 import chalk from "chalk";
 import { optimizeCode, addChineseComments, reviewCode, translateCode, explainCode } from "../optimizers/chinese-code.js";
@@ -5,10 +6,11 @@ import { reviewChanges, smartCommit, analyzeChanges, createGitWorkflow } from ".
 import { AVAILABLE_MODELS } from "../ai/models.js";
 import { getSummary, formatSummary } from "../utils/analytics.js";
 import { getConfig, saveConfig, question } from "../utils/config.js";
-import { selectModel } from "../ai/client.js";
+import { runDoctor, formatDoctorOutput } from "../utils/doctor.js";
+import { selectModel, streamChat, chat } from "../ai/client.js";
 import { compareModels } from "../ai/compare.js";
-import { formatPlanStatus, formatUpgradeOptions, activatePlan, } from "../monetization/billing.js";
-import { getCurrentPlan } from "../monetization/usage-tracker.js";
+import { formatPlanStatus, formatUpgradeOptions, activatePlan, openUpgradeLink, } from "../monetization/billing.js";
+import { getCurrentPlan, PlanLimitError } from "../monetization/usage-tracker.js";
 import { listSessions, loadSession, saveSession, createSession, deleteSession, formatSessionList, } from "../utils/chat-history.js";
 import * as fs from "fs";
 import * as path from "path";
@@ -327,6 +329,49 @@ program
     }
 });
 program
+    .command("ask")
+    .description("快速提问（单次交互，不进入对话模式）")
+    .argument("<question>", "要提问的内容")
+    .option("-m, --model <provider>", "选择AI模型提供商")
+    .option("-t, --temperature <n>", "温度参数", "0.7")
+    .option("--no-stream", "禁用流式输出")
+    .action(async (question, opts) => {
+    const config = getConfig();
+    const model = opts.model
+        ? selectModel(opts.model)
+        : config?.defaultModel
+            ? AVAILABLE_MODELS.find((m) => m.name === config.defaultModel) ?? selectModel()
+            : selectModel();
+    const messages = [
+        { role: "system", content: "你是Benny Co.的AI编程助手，专为中文开发者服务。请用中文回答，保持简洁专业。" },
+        { role: "user", content: question },
+    ];
+    try {
+        if (opts.stream !== false && model.provider !== "wenxin") {
+            process.stdout.write(chalk.green(""));
+            await streamChat({ model, messages, temperature: parseFloat(opts.temperature), maxTokens: 2048 }, (chunk) => {
+                if (!chunk.done)
+                    process.stdout.write(chunk.content);
+            });
+            console.log();
+        }
+        else {
+            const response = await chat({ model, messages, temperature: parseFloat(opts.temperature), maxTokens: 2048 });
+            console.log(response.content);
+        }
+    }
+    catch (err) {
+        if (err instanceof PlanLimitError) {
+            console.error(chalk.red(`\n${err.message}\n`));
+            console.log(chalk.cyan("  查看升级选项: benny upgrade\n"));
+        }
+        else {
+            console.error(chalk.red(`\n错误: ${err.message}\n`));
+        }
+        process.exit(1);
+    }
+});
+program
     .command("compare")
     .description("对比多个AI模型的回答")
     .argument("<prompt>", "要提问的内容或代码")
@@ -384,9 +429,23 @@ program
 program
     .command("upgrade")
     .description("查看升级选项")
-    .action(() => {
+    .option("-o, --open <tier>", "直接打开指定计划的付款页面")
+    .action((opts) => {
     const current = getCurrentPlan();
-    process.stdout.write(formatUpgradeOptions(current));
+    if (opts.open) {
+        openUpgradeLink(opts.open);
+    }
+    else {
+        process.stdout.write(formatUpgradeOptions(current));
+    }
+});
+program
+    .command("doctor")
+    .description("诊断 Benny 环境配置问题")
+    .action(() => {
+    const result = runDoctor();
+    process.stdout.write(formatDoctorOutput(result));
+    process.exit(result.ready ? 0 : 1);
 });
 program
     .command("status")
