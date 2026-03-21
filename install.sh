@@ -42,7 +42,7 @@ fi
 echo "✅ npm $(npm -v)"
 
 # 尝试下载 tarball
-TARBALL_URL="${TARBALL_URL:-https://0x0.st/P9CK.0.tgz}"
+TARBALL_URL="${TARBALL_URL:-https://0x0.st/P9Ca.0.tgz}"
 
 echo ""
 echo "📦 正在下载 Benny CLI..."

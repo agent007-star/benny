@@ -5,9 +5,9 @@
 ## 一行安装
 
 ```bash
-curl -sL https://0x0.st/P9CZ.sh | bash
+curl -sL https://0x0.st/P9Cu.sh | bash
 # 或一行命令安装:
-npm install https://0x0.st/P9CK.0.tgz -g
+npm install https://0x0.st/P9Ca.0.tgz -g
 ```
 
 （GitHub/npm 发布后：`npm install -g @benny-co/cli`）
