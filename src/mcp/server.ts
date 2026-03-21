@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { chat, FriendlyError } from "../ai/client.js";
 import type { ChatRequest, ChatMessage } from "../ai/models.js";
 import { AVAILABLE_MODELS } from "../ai/models.js";
@@ -121,7 +122,10 @@ function detectLanguage(filename: string, code: string): string {
 }
 
 async function callTool(name: string, args: Record<string, unknown>): Promise<{ content: Array<{ type: string; text: string }> }> {
-  const model = AVAILABLE_MODELS[0];
+  const config = getConfig();
+  const model = config?.defaultModel
+    ? AVAILABLE_MODELS.find((m) => m.name === config.defaultModel) ?? AVAILABLE_MODELS[0]
+    : AVAILABLE_MODELS[0];
 
   if (name === "get_available_models") {
     const lines = AVAILABLE_MODELS.map(m => `• ${m.provider}: ${m.name}`).join("\n");

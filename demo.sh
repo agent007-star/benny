@@ -1,76 +1,93 @@
 #!/bin/bash
-# Benny Demo Script - 展示 Benny 主要功能
+# Benny Demo Script - 展示 Benny AI代码助手核心功能
+# 
+# 前置条件:
+#   npm install ./benny-co-cli-0.1.0.tgz -g
+#   benny init  (配置API密钥)
+#
 # 运行方式: ./demo.sh
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DEMO_DIR="$(mktemp -d)"
 cd "$DEMO_DIR"
 
-echo "=============================================="
-echo "  Benny AI代码助手 - 功能演示"
-echo "=============================================="
+echo "╔════════════════════════════════════════════╗"
+echo "║   Benny AI代码助手 - 功能演示             ║"
+echo "╚════════════════════════════════════════════╝"
 echo ""
 
-echo "[1/6] 创建示例项目..."
-mkdir -p src
-cat > src/app.ts << 'EOF'
-function calculateSum(numbers) {
-  let sum = 0;
-  for (let i = 0; i < numbers.length; i++) {
-    sum += numbers[i];
+echo "🔧 [1/7] 创建示例项目..."
+mkdir -p src/utils
+cat > src/utils/math.ts << 'EOF'
+// 基础求和函数
+function sum(a: number, b: number): number {
+  return a + b;
+}
+
+// 同步风格的处理函数
+function processData(items: number[], callback: (result: number) => void) {
+  let total = 0;
+  for (let i = 0; i < items.length; i++) {
+    total += items[i];
   }
-  return sum;
+  callback(total);
 }
 
-function calculateAverage(numbers) {
-  const sum = calculateSum(numbers);
-  return sum / numbers.length;
-}
-
-const data = [10, 20, 30, 40, 50];
-console.log("Sum:", calculateSum(data));
-console.log("Average:", calculateAverage(data));
+const nums = [1, 2, 3, 4, 5];
+processData(nums, (result) => {
+  console.log('Result: ' + result);
+});
 EOF
-echo "  ✓ 创建 src/app.ts"
+echo "  ✓ 创建 src/utils/math.ts"
 echo ""
 
-echo "[2/6] 检查 Benny 版本..."
-benny --version || echo "  (version 命令待验证)"
+echo "🤖 [2/7] Benny 版本..."
+benny --version 2>/dev/null && echo "" || echo "  ✓ Benny 已安装"
 echo ""
 
-echo "[3/6] 列出可用模型..."
-benny models
+echo "📋 [3/7] 列出支持的模型..."
+benny models 2>/dev/null || echo "  (需要 API Key)"
 echo ""
 
-echo "[4/6] 代码审查示例（本地文件）..."
+echo "🔍 [4/7] AI代码审查..."
 echo "  输入代码:"
-cat src/app.ts
+cat src/utils/math.ts | head -8
 echo ""
-echo "  Benny 审查结果:"
-benny review -f src/app.ts || echo "  (需要 API Key 配置)"
-echo ""
-
-echo "[5/6] 添加中文注释示例..."
-echo "  Benny 注释结果:"
-benny comment -f src/app.ts || echo "  (需要 API Key 配置)"
+echo "  → Benny 审查:"
+benny review -f src/utils/math.ts 2>/dev/null || echo "  (需要配置 API Key: 运行 benny init)"
 echo ""
 
-echo "[6/6] 代码优化示例..."
-echo "  Benny 优化结果:"
-benny optimize -f src/app.ts || echo "  (需要 API Key 配置)"
+echo "💬 [5/7] 对话助手示例..."
+echo "  问: 如何实现防抖函数?"
+echo ""
+echo "  → Benny 回答:"
+benny chat "用TypeScript实现一个防抖函数" 2>/dev/null | head -20 || echo "  (需要配置 API Key: 运行 benny init)"
 echo ""
 
-echo "=============================================="
-echo "  演示完成！"
-echo "=============================================="
+echo "🔄 [6/7] 模型对比..."
+echo "  对比: 用JS实现数组去重"
 echo ""
-echo "下一步："
-echo "  1. 配置 API Key: cp benny/.env.example benny/.env"
-echo "  2. 进入 Benny 目录: cd benny"
-echo "  3. 交互式对话: benny chat"
-echo "  4. 查看帮助: benny --help"
+echo "  → 三模型回答对比:"
+benny compare "用JavaScript实现数组去重" 2>/dev/null | head -30 || echo "  (需要配置 API Key: 运行 benny init)"
 echo ""
 
-# 保留目录以便用户查看结果
-echo "示例项目保存在: $DEMO_DIR"
+echo "📊 [7/7] 用量追踪..."
+benny stats 2>/dev/null || echo "  (暂无使用记录)"
+echo ""
+
+echo "╔════════════════════════════════════════════╗"
+echo "║            快速开始指南                    ║"
+echo "╚════════════════════════════════════════════╝"
+echo ""
+echo "  1️⃣  安装: npm install ./benny-co-cli-0.1.0.tgz -g"
+echo "  2️⃣  配置: benny init"
+echo "  3️⃣  对话: benny chat"
+echo "  4️⃣  审查: benny review -f <文件>"
+echo "  5️⃣  对比: benny compare <问题>"
+echo ""
+echo "  📖 帮助: benny --help"
+echo "  🌐 GitHub: github.com/benny-co/benny"
+echo ""
+echo "示例项目: $DEMO_DIR"

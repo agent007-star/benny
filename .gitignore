@@ -9,3 +9,4 @@ pnpm-lock.yaml
 .benny/
 usage.json
 history.json
+coverage/

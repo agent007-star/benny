@@ -1,7 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
 import { homedir } from "os";
-import type { ChatMessage } from "../ai/models.js";
 
 const ANALYTICS_DIR = path.join(homedir(), ".benny");
 const ANALYTICS_FILE = path.join(ANALYTICS_DIR, "usage.json");

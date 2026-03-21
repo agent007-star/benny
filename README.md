@@ -2,6 +2,16 @@
 
 > Benny Co. MVP - AI编程助手，深度整合国产AI模型，专为中文开发者打造。
 
+## 一行安装
+
+```bash
+curl -sL https://0x0.st/P9CZ.sh | bash
+# 或一行命令安装:
+npm install https://0x0.st/P9CK.0.tgz -g
+```
+
+（GitHub/npm 发布后：`npm install -g @benny-co/cli`）
+
 ## 核心功能
 
 - **多模型支持**: 通义 (阿里云)、文心 (百度)、Kimi (月之暗面)
@@ -62,6 +72,9 @@ cp .npmrc.example ~/.npmrc
 # 初始化配置（推荐第一步）
 benny init
 
+# 快速提问（单次交互，不进入对话模式）
+benny ask "如何实现快速排序"
+
 # 交互式对话（默认使用通义，流式输出）
 benny chat
 
@@ -102,6 +115,9 @@ benny git commit -m "添加用户认证模块"
 
 # 列出可用模型
 benny models
+
+# 诊断环境配置（首次使用必读）
+benny doctor
 
 # 查看使用统计
 benny stats --days 7

@@ -5,7 +5,8 @@ All notable changes to Benny will be documented in this file.
 ## [0.1.0] - 2026-03-20
 
 ### Added
-- **Core CLI**: `benny` command with 15 subcommands
+- **Core CLI**: `benny` command with 17 subcommands
+- **One-shot ask**: `benny ask "question"` — quick AI answers without entering chat mode
 - **Multi-model AI**: Support for Tongyi (Qwen), Wenxin (ERNIE), Kimi (Moonshot)
 - **Streaming output**: Real-time token-by-token response display
 - **MCP Server**: Full Model Context Protocol server with 6 tools (stdio JSON-RPC 2.0)
@@ -18,5 +19,6 @@ All notable changes to Benny will be documented in this file.
 - **Git workflow**: `benny git review`, `benny git analyze`, `benny git commit`
 - **Chinese code optimization**: Style presets (Aliyun/Baidu/Tencent/General), Chinese comments, variable naming
 - **Friendly error UX**: Chinese error messages with error codes (401/403/429/500)
+- **Environment doctor**: `benny doctor` — diagnose configuration, API keys, and environment health
 - **GitHub Actions CI/CD**: Full pipeline with typecheck, build, pack, release
 - **MIT License**

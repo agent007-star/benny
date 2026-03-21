@@ -104,7 +104,7 @@ export async function chatLoop(
     } catch (err) {
       if (err instanceof PlanLimitError) {
         console.error(chalk.red(`\n${err.message}\n`));
-        console.log(chalk.cyan("  查看升級選項: benny upgrade\n"));
+        console.log(chalk.cyan("  查看升级选项: benny upgrade\n"));
       } else {
         console.error(chalk.red(`\n错误: ${(err as Error).message}\n`));
       }

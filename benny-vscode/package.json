@@ -1,0 +1,105 @@
+{
+  "name": "benny-vscode",
+  "displayName": "Benny AI — AI Code Assistant",
+  "description": "為中文開發者打造的AI代碼助手，支持通義/文心/Kimi",
+  "publisher": "benny-co",
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "benny.openChat",
+        "title": "Benny: Open Chat"
+      },
+      {
+        "command": "benny.optimize",
+        "title": "Benny: Optimize Code"
+      },
+      {
+        "command": "benny.review",
+        "title": "Benny: Review File"
+      },
+      {
+        "command": "benny.explain",
+        "title": "Benny: Explain Code"
+      },
+      {
+        "command": "benny.acceptSuggestion",
+        "title": "Benny: Accept Suggestion"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "benny.optimize",
+          "when": "editorHasSelection",
+          "group": "benny"
+        },
+        {
+          "command": "benny.explain",
+          "when": "editorHasSelection",
+          "group": "benny"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Benny AI",
+      "properties": {
+        "benny.defaultModel": {
+          "type": "string",
+          "default": "qwen-plus",
+          "description": "默認AI模型"
+        },
+        "benny.enableInlineSuggestions": {
+          "type": "boolean",
+          "default": true,
+          "description": "啟用行內代碼建議"
+        },
+        "benny.cliPath": {
+          "type": "string",
+          "default": "benny",
+          "description": "Benny CLI 路徑（自動檢測或手動指定）"
+        },
+        "benny.enableChat": {
+          "type": "boolean",
+          "default": true,
+          "description": "啟用聊天面板"
+        },
+        "benny.enableCodeReview": {
+          "type": "boolean",
+          "default": true,
+          "description": "啟用代碼審查功能"
+        },
+        "benny.language": {
+          "type": "string",
+          "default": "zh-TW",
+          "enum": ["zh-TW", "zh-CN", "en"],
+          "description": "界面語言"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.15",
+    "@types/vscode": "^1.110.0",
+    "@typescript-eslint/eslint-plugin": "^8.57.1",
+    "@typescript-eslint/parser": "^8.57.1",
+    "eslint": "^10.1.0",
+    "typescript": "^5.9.3"
+  }
+}

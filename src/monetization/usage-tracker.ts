@@ -81,10 +81,10 @@ export class PlanLimitError extends Error {
   ) {
     const pct = Math.round((used / limit) * 100);
     super(
-      `本月使用量已達 ${pct}% (${used.toLocaleString()}/${limit.toLocaleString()} tokens)\n` +
-      `你的計劃: ${PLANS[plan].name} (${plan === "free" ? "免費" : `$${PLANS[plan].priceMonthly}/月`})\n` +
-      `超額費用: $${overageCost.toFixed(2)}/1k tokens\n\n` +
-      `運行 'benny upgrade' 升級計劃，或等待下月配額重置。`
+      `本月使用量已达 ${pct}% (${used.toLocaleString()}/${limit.toLocaleString()} tokens)\n` +
+      `你的计划: ${PLANS[plan].name} (${plan === "free" ? "免费" : `$${PLANS[plan].priceMonthly}/月`})\n` +
+      `超额费用: $${overageCost.toFixed(2)}/1k tokens\n\n` +
+      `运行 'benny upgrade' 升级计划，或等待下月配额重置。`
     );
     this.name = "PlanLimitError";
   }
@@ -106,8 +106,8 @@ export function checkLimit(additionalTokens: number = 5000): void {
     const pct = Math.round((used / limit) * 100);
     console.warn(
       chalk.yellow(
-        `\n⚠️  配額警告: 已使用 ${pct}% (${used.toLocaleString()}/${limit.toLocaleString()} tokens)\n` +
-        `    剩餘 ~${(remaining / 1000).toFixed(0)}k tokens。運行 'benny upgrade' 升級。\n`
+        `\n⚠️  配额警告: 已使用 ${pct}% (${used.toLocaleString()}/${limit.toLocaleString()} tokens)\n` +
+        `    剩余 ~${(remaining / 1000).toFixed(0)}k tokens。运行 'benny upgrade' 升级。\n`
       )
     );
   }

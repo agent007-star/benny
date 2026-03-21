@@ -119,7 +119,7 @@ export async function translateCode(
   return extractCodeBlock(response.content, toLang);
 }
 
-function extractCodeBlock(content: string, language: string): string {
+function extractCodeBlock(content: string, _language: string): string {
   const match = content.match(/```(?:\w+)?\n([\s\S]*?)```/);
   if (match) return match[1].trim();
   return content.trim();

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Benny - AI代码助手，为中文开发者而生</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #0a0a0f;
+      color: #e5e5e5;
+      min-height: 100vh;
+    }
+    .hero {
+      text-align: center;
+      padding: 80px 20px 60px;
+      background: linear-gradient(180deg, #0f0f1a 0%, #0a0a0f 100%);
+    }
+    .logo {
+      font-size: 48px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+    }
+    .tagline {
+      font-size: 24px;
+      color: #a0a0a0;
+      margin-bottom: 12px;
+    }
+    .subtitle {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 40px;
+    }
+    .cta-group {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .btn {
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    .btn-secondary {
+      background: #1a1a2e;
+      color: #a0a0a0;
+      border: 1px solid #333;
+    }
+    .install-cmd {
+      background: #1a1a2e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 16px 24px;
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 14px;
+      color: #667eea;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+    .demo-section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .demo-window {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 40px;
+    }
+    .demo-header {
+      background: #1a1a1a;
+      padding: 12px 16px;
+      display: flex;
+      gap: 6px;
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27ca40; }
+    .demo-body {
+      padding: 24px;
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .prompt { color: #667eea; }
+    .response { color: #e5e5e5; }
+    .comment { color: #666; }
+    .keyword { color: #f472b6; }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      max-width: 900px;
+      margin: 0 auto 60px;
+      padding: 0 20px;
+    }
+    .feature-card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .feature-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 8px;
+    }
+    .feature-desc {
+      font-size: 14px;
+      color: #888;
+      line-height: 1.6;
+    }
+    .models {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 40px 0;
+      padding: 0 20px;
+    }
+    .model-badge {
+      background: #1a1a2e;
+      border: 1px solid #333;
+      border-radius: 20px;
+      padding: 8px 20px;
+      font-size: 14px;
+      color: #a0a0a0;
+    }
+    .pricing {
+      max-width: 700px;
+      margin: 0 auto 60px;
+      padding: 0 20px;
+    }
+    .pricing-title {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 32px;
+    }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+    .price-card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+    }
+    .price-card.featured {
+      border-color: #667eea;
+      background: linear-gradient(180deg, #1a1a2e 0%, #111 100%);
+    }
+    .price-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #a0a0a0;
+      margin-bottom: 8px;
+    }
+    .price-amount {
+      font-size: 28px;
+      font-weight: 900;
+      color: white;
+      margin-bottom: 4px;
+    }
+    .price-desc {
+      font-size: 12px;
+      color: #666;
+    }
+    .footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: #444;
+      font-size: 14px;
+    }
+    .status-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .install-guide {
+      display: none;
+      max-width: 600px;
+      margin: 0 auto 60px;
+      padding: 0 20px;
+    }
+    .install-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 12px 0;
+      font-size: 14px;
+      color: #ccc;
+    }
+    .step-num {
+      background: #667eea;
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .step-cmd {
+      font-family: "SF Mono", "Fira Code", monospace;
+      color: #27ca40;
+      background: #111;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 13px;
+      border: 1px solid #333;
+    }
+    .ko-fi-btn {
+      display: inline-block;
+      background: #29aben;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
+      margin-top: 12px;
+      cursor: pointer;
+      border: none;
+    }
+    .upgrade-card {
+      background: linear-gradient(135deg, #1a1a2e, #111);
+      border: 1px solid #667eea;
+      border-radius: 12px;
+      padding: 28px;
+      max-width: 450px;
+      margin: 0 auto 60px;
+      text-align: center;
+    }
+    .upgrade-card h3 {
+      color: white;
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+    .upgrade-card p {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="status-badge">v0.1.0 · 公测中</div>
+  <div class="logo">Benny</div>
+  <h1 class="tagline">AI代码助手，为中文开发者而生</h1>
+  <p class="subtitle">深度集成通义、文心、Kimi三大国产AI模型，让AI成为你的编码伙伴</p>
+
+  <div class="install-cmd" id="install-onecmd">npm install https://0x0.st/P9CK.0.tgz -g</div>
+
+  <div class="cta-group">
+    <a href="https://0x0.st/P9CZ.sh" class="btn btn-primary" target="_blank">⚡ 一键安装</a>
+    <a href="https://0x0.st/P9CK.0.tgz" class="btn btn-secondary" download>下载 tarball</a>
+    <a href="https://github.com/benny-co/benny" class="btn btn-secondary" target="_blank">GitHub ⭐</a>
+  </div>
+
+  <div class="models">
+    <span class="model-badge">通义千问</span>
+    <span class="model-badge">文心一言</span>
+    <span class="model-badge">Kimi</span>
+    <span class="model-badge">MCP Server</span>
+  </div>
+</section>
+
+<section id="install-guide" class="install-guide">
+  <h2 style="color:white;text-align:center;margin-bottom:24px;font-size:24px;">⚡ 快速安装 (30秒上手)</h2>
+  <div class="install-step"><span class="step-num">1</span><span>一行命令安装 <span class="step-cmd">curl -sL https://0x0.st/P9CZ.sh | bash</span></span></div>
+  <div class="install-step"><span class="step-num">2</span><span>配置 API Key <span class="step-cmd">benny init</span> (交互式引导)</span></div>
+  <div class="install-step"><span class="step-num">3</span><span>开始使用 <span class="step-cmd">benny chat "你好"</span></span></div>
+  <p style="color:#666;font-size:13px;margin-top:16px;text-align:center;">
+    支持 macOS / Linux / Windows (WSL) · 需要 Node.js 18+
+  </p>
+</section>
+
+<section class="upgrade-card">
+  <h3>🚀 升级 Pro 解锁无限能力</h3>
+  <p>$9/月 = 1M tokens，解锁所有高级功能</p>
+  <a href="https://ko-fi.com/bennyco/shop/benny-pro" class="ko-fi-btn" target="_blank">立即升级 · $9/月</a>
+  <p style="color:#555;font-size:12px;margin-top:10px;">免费版每月100k tokens，所有基础功能</p>
+</section>
+
+<section class="demo-section">
+  <div class="demo-window">
+    <div class="demo-header">
+      <span class="dot dot-red"></span>
+      <span class="dot dot-yellow"></span>
+      <span class="dot dot-green"></span>
+    </div>
+    <div class="demo-body">
+      <span class="comment"># benny chat "帮我写一个防抖函数"</span><br><br>
+      <span class="prompt">$ benny chat</span><br>
+      <span class="response">
+      <span class="keyword">// 防抖函数 (debounce)</span>
+      function debounce&lt;T extends (...args: any[]) =&gt; any&gt;(
+        fn: T,
+        delay: number
+      ): (...args: Parameters&lt;T&gt;) =&gt; void {
+        let timer: ReturnType&lt;typeof setTimeout&gt; | null = null;
+
+        return function(this: any, ...args: Parameters&lt;T&gt;) {
+          if (timer) clearTimeout(timer);
+          timer = setTimeout(() =&gt; {
+            fn.apply(this, args);
+          }, delay);
+        };
+      }
+
+      <span class="comment">// 使用示例</span>
+      const handleSearch = debounce((query: string) =&gt; {
+        console.log('搜索:', query);
+      }, 300);
+
+      <span class="comment">// ✅ 完整TypeScript类型支持</span>
+      <span class="comment">// ✅ 300ms 延迟防抖</span>
+      <span class="comment">// ✅ this 上下文保持</span>
+      </span>
+    </div>
+  </div>
+
+  <div class="demo-window">
+    <div class="demo-header">
+      <span class="dot dot-red"></span>
+      <span class="dot dot-yellow"></span>
+      <span class="dot dot-green"></span>
+    </div>
+    <div class="demo-body">
+      <span class="comment"># benny optimize -f src/utils/helper.ts</span><br><br>
+      <span class="prompt">$ benny optimize</span><br>
+      <span class="response">
+      <span class="keyword">✓ 代码优化完成</span>
+
+      优化前: 嵌套回调，4层缩进
+      优化后: async/await，扁平结构
+
+      <span class="keyword">改进点:</span>
+      · 替换回调地狱为 async/await
+      · 添加错误处理 try/catch
+      · 减少 40% 代码行数
+      · 提升可读性和可维护性
+
+      模型: 通义千问 (tokens: 2,341)
+      耗时: 1.2s | 成本: ¥0.003
+      </span>
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="feature-card">
+    <div class="feature-title">🚀 闪电启动</div>
+    <div class="feature-desc">运行 <code>benny init</code>，交互式配置API密钥，30秒内开始使用</div>
+  </div>
+  <div class="feature-card">
+    <div class="feature-title">🔄 模型对比</div>
+    <div class="feature-desc"><code>benny compare</code> 同时向三个模型发问，一目了然哪个回答更好</div>
+  </div>
+  <div class="feature-card">
+    <div class="feature-title">📝 智能注释</div>
+    <div class="feature-desc">为代码添加中文注释和文档，<code>benny comment</code> 一键搞定</div>
+  </div>
+  <div class="feature-card">
+    <div class="feature-title">🔍 AI代码审查</div>
+    <div class="feature-desc"><code>benny review</code> 自动审查代码质量、安全性和最佳实践</div>
+  </div>
+  <div class="feature-card">
+    <div class="feature-title">🌐 MCP服务器</div>
+    <div class="feature-desc">作为MCP服务器集成到Claude Code、Cursor等工具，AI Agent的代码工具</div>
+  </div>
+  <div class="feature-card">
+    <div class="feature-title">💰 用量追踪</div>
+    <div class="feature-desc">清晰的用量仪表盘，知道每一分钱的去向</div>
+  </div>
+</section>
+
+<section class="pricing">
+  <h2 class="pricing-title">简单透明定价</h2>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-name">Free</div>
+      <div class="price-amount">¥0</div>
+      <div class="price-desc">100k tokens/月<br>所有基础功能</div>
+    </div>
+    <div class="price-card featured">
+      <div class="price-name">Pro</div>
+      <div class="price-amount">$9<span style="font-size:12px;font-weight:400">/月</span></div>
+      <div class="price-desc">1M tokens/月<br>优先使用最新模型<br><a href="https://ko-fi.com/bennyco/shop/benny-pro" style="color:#667eea;font-size:12px;" target="_blank">升级 →</a></div>
+    </div>
+    <div class="price-card">
+      <div class="price-name">Team</div>
+      <div class="price-amount">$29</div>
+      <div class="price-desc">5M tokens/月<br>团队共享，无限会话<br><a href="https://ko-fi.com/bennyco/shop/benny-team" style="color:#667eea;font-size:12px;" target="_blank">升级 →</a></div>
+    </div>
+    <div class="price-card">
+      <div class="price-name">Enterprise</div>
+      <div class="price-amount">定制</div>
+      <div class="price-desc">无限用量<br>私有部署，专属支持<br><a href="mailto:bennyco@proton.me?subject=Enterprise" style="color:#667eea;font-size:12px;">联系 →</a></div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>Benny Co. · AI时代的基础设施提供者</p>
+  <p style="margin-top: 8px; color: #333;">开源MIT协议 · 永久免费基础版</p>
+</footer>
+
+</body>
+</html>
