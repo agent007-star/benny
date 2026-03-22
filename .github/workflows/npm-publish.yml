@@ -1,0 +1,127 @@
+name: Publish to npm
+
+on:
+  # 方式一：發布 GitHub Release 時自動發佈到 npm
+  release:
+    types: [published]
+  
+  # 方式二：手動觸發發佈
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 0.1.0) or leave empty for auto-detect'
+        required: false
+        default: ''
+      tag:
+        description: 'NPM dist-tag (latest, beta, etc.)'
+        required: false
+        default: 'latest'
+
+  # 方式三：push 到 master 時自動發佈（檢測版本變化）
+  push:
+    branches: [master]
+    paths:
+      - 'package.json'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write  # Required for npm provenance
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Detect version change
+      id: version
+      run: |
+        # Get current version from package.json
+        CURRENT_VERSION=$(node -p "require('./package.json').version")
+        echo "Current version: $CURRENT_VERSION"
+        echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+        
+        # Check if this is a manual dispatch with specific version
+        if [ -n "${{ github.event.inputs.version }}" ]; then
+          echo "Manual version: ${{ github.event.inputs.version }}"
+          echo "publish=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
+          echo "mode=manual" >> $GITHUB_OUTPUT
+        else
+          # Auto-detect: Get latest tag
+          git fetch --tags
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -n "$LATEST_TAG" ]; then
+            TAG_VERSION=${LATEST_TAG#v}
+            echo "Latest tag: $TAG_VERSION"
+            if [ "$TAG_VERSION" != "$CURRENT_VERSION" ]; then
+              echo "Version changed! Publishing $CURRENT_VERSION"
+              echo "publish=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+              echo "tag=latest" >> $GITHUB_OUTPUT
+              echo "mode=auto" >> $GITHUB_OUTPUT
+            else
+              echo "No version change, skipping publish"
+              echo "publish=" >> $GITHUB_OUTPUT
+              echo "mode=skip" >> $GITHUB_OUTPUT
+            fi
+          else
+            # No tags, first publish
+            echo "First publish: $CURRENT_VERSION"
+            echo "publish=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+            echo "tag=latest" >> $GITHUB_OUTPUT
+            echo "mode=first" >> $GITHUB_OUTPUT
+          fi
+        fi
+
+    - name: Setup Node.js
+      if: steps.version.outputs.mode != 'skip'
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        registry-url: 'https://registry.npmjs.org/'
+        cache: 'pnpm'
+
+    - name: Install dependencies
+      if: steps.version.outputs.mode != 'skip'
+      run: pnpm install --frozen-lockfile
+
+    - name: Build
+      if: steps.version.outputs.mode != 'skip'
+      run: pnpm run build
+
+    - name: Configure npm token
+      if: steps.version.outputs.mode != 'skip'
+      run: |
+        # Create .npmrc with token
+        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+        # Also create in workspace for pnpm
+        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+
+    - name: Publish to npm
+      if: steps.version.outputs.mode != 'skip'
+      run: |
+        VERSION="${{ steps.version.outputs.publish }}"
+        TAG="${{ steps.version.outputs.tag }}"
+        
+        if [ -n "$VERSION" ]; then
+          echo "Publishing @benny-co/cli@$VERSION with tag $TAG"
+          pnpm publish --no-git-checks --access public --tag $TAG
+        else
+          echo "No version to publish, skipping"
+          exit 0
+        fi
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    - name: Create Git tag on successful publish
+      if: steps.version.outputs.mode != 'skip' && steps.version.outputs.publish != ''
+      run: |
+        VERSION="${{ steps.version.outputs.publish }}"
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git tag -a "v$VERSION" -m "Release v$VERSION"
+        git push origin "v$VERSION"
