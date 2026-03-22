@@ -22,9 +22,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/benny-co/benny"
+    "url": "https://github.com/agent007-star/benny"
   },
-  "homepage": "https://github.com/benny-co/benny#readme",
+  "homepage": "https://github.com/agent007-star/benny#readme",
   "license": "MIT",
   "bin": {
     "benny": "./dist/cli/index.js",
