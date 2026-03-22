@@ -85,6 +85,10 @@ jobs:
         registry-url: 'https://registry.npmjs.org/'
         cache: 'pnpm'
 
+    - name: Install pnpm
+      if: steps.version.outputs.mode != 'skip'
+      run: npm install -g pnpm
+
     - name: Install dependencies
       if: steps.version.outputs.mode != 'skip'
       run: pnpm install --frozen-lockfile
