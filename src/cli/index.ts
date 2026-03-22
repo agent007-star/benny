@@ -378,16 +378,36 @@ program
     try {
       if (opts.stream !== false && model.provider !== "wenxin") {
         process.stdout.write(chalk.green(""));
+        let usage: { promptTokens: number; completionTokens: number; totalTokens: number } | undefined;
+        const start = Date.now();
+
         await streamChat(
           { model, messages, temperature: parseFloat(opts.temperature), maxTokens: 2048 },
           (chunk) => {
-            if (!chunk.done) process.stdout.write(chunk.content);
+            if (!chunk.done) {
+              process.stdout.write(chunk.content);
+            } else if (chunk.usage) {
+              usage = chunk.usage;
+            }
           }
         );
         console.log();
+
+        const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+        const tokenInfo = usage
+          ? chalk.gray(`\n[${usage.totalTokens} tokens, ${elapsed}s]\n`)
+          : chalk.gray(`\n[${elapsed}s]\n`);
+        process.stdout.write(tokenInfo);
       } else {
+        const start = Date.now();
         const response = await chat({ model, messages, temperature: parseFloat(opts.temperature), maxTokens: 2048 });
-        console.log(response.content);
+        const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+        const tokenInfo = response.usage
+          ? chalk.gray(` [${response.usage.totalTokens} tokens, ${elapsed}s]\n`)
+          : chalk.gray(` [${elapsed}s]\n`);
+
+        console.log(chalk.green("\nBenny: ") + response.content.replace(/\n/g, "\n" + chalk.green("Benny: ")));
+        console.log(tokenInfo);
       }
     } catch (err) {
       if (err instanceof PlanLimitError) {

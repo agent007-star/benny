@@ -52,28 +52,38 @@ export async function streamChat(
     );
   }
 
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${apiKey}`,
-  };
+   const headers: Record<string, string> = {
+     "Content-Type": "application/json",
+     Authorization: `Bearer ${apiKey}`,
+   };
 
-  if (model.provider === "wenxin") {
-    throw new FriendlyError("文心模型暂不支持流式输出，请使用 'benny chat --no-stream' 或切换到通义/Kimi模型。", "wenxin_stream_unsupported");
-  }
+   if (model.provider === "wenxin") {
+     throw new FriendlyError("文心模型暂不支持流式输出，请使用 'benny chat --no-stream' 或切换到通义/Kimi模型。", "wenxin_stream_unsupported");
+   }
 
-  const body: Record<string, unknown> = {
-    model: model.name,
-    messages,
-    temperature,
-    max_tokens: maxTokens,
-    stream: true,
-  };
+   const body: Record<string, unknown> = {
+     model: model.name,
+     messages,
+     temperature,
+     max_tokens: maxTokens,
+     stream: true,
+   };
 
-  const response = await fetch(model.endpoint, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(body),
-  });
+   let response;
+   try {
+     response = await fetch(model.endpoint, {
+       method: "POST",
+       headers,
+       body: JSON.stringify(body),
+     });
+   } catch (err) {
+     // Network error or fetch failed
+     recordUsage(model.name, model.provider, command, 0, 0, 0, false, `Network error: ${(err as Error).message}`);
+     throw new FriendlyError(
+       "网络连接失败，请检查您的网络连接后重试。",
+       "network_error"
+     );
+   }
 
   if (!response.ok) {
     const classified = classifyError(response.status);
@@ -176,29 +186,39 @@ export async function chat(request: ChatRequest, command = "chat"): Promise<Chat
     );
   }
 
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${apiKey}`,
-  };
+   const headers: Record<string, string> = {
+     "Content-Type": "application/json",
+     Authorization: `Bearer ${apiKey}`,
+   };
 
-  if (model.provider === "wenxin") {
-    const secretKey = resolveApiKey("WENXIN_SECRET_KEY", config?.apiKeys?.WENXIN_SECRET_KEY);
-    const accessToken = await getWenxinAccessToken(apiKey, secretKey);
-    headers["Authorization"] = `Bearer ${accessToken}`;
-  }
+   if (model.provider === "wenxin") {
+     const secretKey = resolveApiKey("WENXIN_SECRET_KEY", config?.apiKeys?.WENXIN_SECRET_KEY);
+     const accessToken = await getWenxinAccessToken(apiKey, secretKey);
+     headers["Authorization"] = `Bearer ${accessToken}`;
+   }
 
-  const body: Record<string, unknown> = {
-    model: model.name,
-    messages,
-    temperature,
-    max_tokens: maxTokens,
-  };
+    const body: Record<string, unknown> = {
+      model: model.name,
+      messages,
+      temperature,
+      max_tokens: maxTokens,
+    };
 
-  const response = await fetch(model.endpoint, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(body),
-  });
+    let response;
+    try {
+      response = await fetch(model.endpoint, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+      });
+    } catch (err) {
+      // Network error or fetch failed
+      recordUsage(model.name, model.provider, command, 0, 0, 0, false, `Network error: ${(err as Error).message}`);
+      throw new FriendlyError(
+        "网络连接失败，请检查您的网络连接后重试。",
+        "network_error"
+      );
+    }
 
   if (!response.ok) {
     const classified = classifyError(response.status);
