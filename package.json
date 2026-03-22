@@ -1,6 +1,6 @@
 {
   "name": "@benny-co/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Benny - AI代码助手，专为中文开发者打造。支持通义、文心、Kimi等国产AI模型，提供代码优化、注释生成、AI审查、Git工作流集成等功能。",
   "type": "module",
   "keywords": [
